@@ -50,6 +50,20 @@ class Unfuddle
     
     
     
+    def find_severity_by_name!(name)
+      severity = severities.find { |severity| severity.name == value }
+      severity || raise("A severity named \"#{value}\" is not defined!")
+    end
+    
+    def find_custom_field_value_by_value!(field, value)
+      n = number_of_custom_field_named(field)
+      result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.value == value }
+      raise "A custom field value named \"#{value}\" is not defined!" unless result
+      result
+    end
+    
+    
+    
     def find_tickets(*conditions)
       path = "ticket_reports/dynamic.json"
       params = create_conditions_string(*conditions)
