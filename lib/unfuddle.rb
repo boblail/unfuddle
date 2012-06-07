@@ -1,6 +1,7 @@
 require 'net/https'
 require 'json'
 require 'active_support/core_ext/hash'
+require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
 
 
@@ -10,11 +11,11 @@ class Unfuddle
     
     def config(*args)
       configuration = Unfuddle::Configuration.new(instance)
-      if args.first
-        options = args.first
-        configuration.subdomain = options["subdomain"] if options.key?("subdomain")
-        configuration.username  = options["username"]  if options.key?("username")
-        configuration.password  = options["password"]  if options.key?("password")
+      if args.first.is_a?(Hash)
+        options = args.first.with_indifferent_access
+        configuration.subdomain = options[:subdomain] if options.key?(:subdomain)
+        configuration.username  = options[:username]  if options.key?(:username)
+        configuration.password  = options[:password]  if options.key?(:password)
       end
       yield configuration if block_given?
       configuration
