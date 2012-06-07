@@ -37,6 +37,13 @@ class Unfuddle
       @attributes[attribute] = value
     end
     
+    def update_attribute(attribute, value)
+      write_attribute(attribute, value)
+      save!
+      # xml = "<ticket><#{attribute}>#{value}</#{attribute}></ticket>"
+      # put("", xml)
+    end
+    
     
     
     # Finders
