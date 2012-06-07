@@ -1,4 +1,6 @@
 require 'unfuddle/base'
+require 'active_support/core_ext/array/wrap'
+
 
 class Unfuddle
   class Project < Base
@@ -44,8 +46,12 @@ class Unfuddle
       (1..3).find { |n| custom_fields[n].nil? }
     end
     
-    def number_of_custom_field_named(title)
-      custom_fields.key(title)
+    def number_of_custom_field_named(name)
+      custom_fields.key(name)
+    end
+    
+    def number_of_custom_field_named!(name)
+      number_of_custom_field_named(name) || raise("A custom field named \"#{name}\" is not defined!")
     end
     
     
@@ -56,9 +62,9 @@ class Unfuddle
     end
     
     def find_custom_field_value_by_value!(field, value)
-      n = number_of_custom_field_named(field)
+      n = number_of_custom_field_named!(field)
       result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.value == value }
-      raise "A custom field value named \"#{value}\" is not defined!" unless result
+      raise "\"#{value}\" is not a value for the custom field \"#{field}\"!" unless result
       result
     end
     
@@ -77,14 +83,36 @@ class Unfuddle
     
     def create_conditions_string(*conditions)
       options = conditions.extract_options!
-      conditions.concat(options.map { |key, value|
-        if value.is_a?(Array)
-          value.map { |val| "#{key}-eq-#{val}" }.join("|")
-        else
-          "#{key}-eq-#{value}"
-        end
-      })
+      conditions.concat(options.map { |key, value| Array.wrap(value).map { |value| create_condition_string(key, value) }.join("|") })
       "conditions_string=#{conditions.join("%2C")}"
+    end
+    
+    def create_condition_string(key, value)
+      comparison = "eq"
+      comparison, value = "neq", value.value if value.is_a?(Neq)
+      key, value = prepare_key_and_value_for_conditions_string(key, value)
+      "#{key}-#{comparison}-#{value}"
+    end
+    
+    def prepare_key_and_value_for_conditions_string(key, value)
+      
+      # If the value is an id, convert it to a number
+      value = value.to_i if value.is_a?(String) && value =~ /^\d+$/
+      
+      # If the value is the name of a severity, try to look it up
+      value = find_severity_by_name!(value).id if key.to_s == :severity && value.is_a?(String)
+      
+      # If the key is a custom field, look up the key and value
+      if key.is_a?(String) && custom_field_defined?(key)
+        value = find_custom_field_value_by_value!(key, value).id unless value.is_a?(Fixnum)
+        key = get_key_for_custom_field_named!(key)
+      end
+      
+      [key, value]
+    end
+    
+    def get_key_for_custom_field_named!(name)
+      "field_#{number_of_custom_field_named!(name)}"
     end
     
     
