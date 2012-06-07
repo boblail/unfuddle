@@ -3,6 +3,7 @@ require 'json'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
+require 'unfuddle/project'
 
 
 class Unfuddle
@@ -39,6 +40,12 @@ class Unfuddle
   attr_reader :subdomain,
               :username,
               :password
+  
+  
+  
+  def project(project_id)
+    Unfuddle::Project.fetch(project_id)
+  end
   
   
   

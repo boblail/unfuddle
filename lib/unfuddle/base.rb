@@ -74,6 +74,12 @@ class Unfuddle
             @#{collection_name} ||= get('#{path}')[1].map { |attributes| #{class_name}.new(attributes) }
           end
           
+          def #{individual_name}(id)
+            response = get('#{path}/' + id)
+            return nil if response[1] == :invalid
+            #{class_name}.new response[1]
+          end
+          
           def create_#{individual_name}(params)
             instance = #{class_name}.new(params)
             attributes = post('#{path}', instance)[1]
