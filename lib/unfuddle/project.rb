@@ -22,6 +22,7 @@ class Unfuddle
     has_many :custom_field_values
     has_many :severities
     has_many :ticket_reports
+    has_many :tickets
     
     
     
@@ -45,6 +46,31 @@ class Unfuddle
     
     def number_of_custom_field_named(title)
       custom_fields.key(title)
+    end
+    
+    
+    
+    def find_tickets(*conditions)
+      path = "ticket_reports/dynamic.json"
+      params = create_conditions_string(*conditions)
+      path << "?#{params}" if params
+      response = get(path)
+      raise "Invalid response" if response[1] == :invalid
+      ticket_report = response[1]
+      group0 = ticket_report.fetch("groups", [])[0] || {}
+      group0.fetch("tickets", [])
+    end
+    
+    def create_conditions_string(*conditions)
+      options = conditions.extract_options!
+      conditions.concat(options.map { |key, value|
+        if value.is_a?(Array)
+          value.map { |val| "#{key}-eq-#{val}" }.join("|")
+        else
+          "#{key}-eq-#{value}"
+        end
+      })
+      "conditions_string=#{conditions.join("%2C")}"
     end
     
     
