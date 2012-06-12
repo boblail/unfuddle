@@ -71,9 +71,9 @@ class Unfuddle
     
     
     def find_tickets(*conditions)
+      raise "No conditions supplied: that's probably not good" if conditions.none?
       path = "ticket_reports/dynamic.json"
-      params = create_conditions_string(*conditions)
-      path << "?#{params}" if params
+      path << "?conditions_string=#{construct_ticket_query(*conditions)}"
       response = get(path)
       raise "Invalid response" if response[1] == :invalid
       ticket_report = response[1]
@@ -81,10 +81,10 @@ class Unfuddle
       group0.fetch("tickets", [])
     end
     
-    def create_conditions_string(*conditions)
+    def construct_ticket_query(*conditions)
       options = conditions.extract_options!
       conditions.concat(options.map { |key, value| Array.wrap(value).map { |value| create_condition_string(key, value) }.join("|") })
-      "conditions_string=#{conditions.join("%2C")}"
+      conditions.join("%2C")
     end
     
     def create_condition_string(key, value)
