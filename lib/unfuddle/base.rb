@@ -37,6 +37,13 @@ class Unfuddle
       @attributes[attribute] = value
     end
     
+    def update_attributes!(attributes)
+      attributes.each do |key, value|
+        write_attribute(key, value)
+      end
+      save!
+    end
+    
     def update_attribute(attribute, value)
       write_attribute(attribute, value)
       save!
