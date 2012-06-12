@@ -87,6 +87,10 @@ class Unfuddle
             #{class_name}.new response[1]
           end
           
+          def new_#{individual_name}(attributes)
+            #{class_name}.new(attributes)
+          end
+          
           def create_#{individual_name}(params)
             instance = #{class_name}.new(params)
             attributes = post('#{path}', instance)[1]
