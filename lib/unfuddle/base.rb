@@ -1,5 +1,6 @@
 require 'unfuddle'
 require 'active_support/inflector'
+require 'active_support/core_ext/hash'
 
 
 class Unfuddle
