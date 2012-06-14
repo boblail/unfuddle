@@ -89,7 +89,7 @@ class Unfuddle
           end
           
           def #{individual_name}(id)
-            response = get('#{path}/' + id)
+            response = get("#{path}/\#{id}")
             return nil if response[1] == :invalid
             #{class_name}.new response[1]
           end
