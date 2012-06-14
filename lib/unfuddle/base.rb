@@ -135,7 +135,7 @@ class Unfuddle
     # Serialization
     
     def to_params
-      @attributes
+      attributes
     end
     
     def singular_name
