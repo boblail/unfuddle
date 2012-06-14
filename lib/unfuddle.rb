@@ -59,11 +59,11 @@ class Unfuddle
   
   def post(path, object)
     path = "/api/v1/#{path}"
-    json = object.to_xml
+    xml = object.to_xml
     request = Net::HTTP::Post.new(path, {"Content-type" => "application/xml"})
     request.basic_auth @username, @password
-    puts "[unfuddle:post]  #{path}\n  #{json}"
-    http_send request, json
+    puts "[unfuddle:post]  #{path}\n  #{xml}"
+    http_send request, xml
   end
   
   def put(path, object)
