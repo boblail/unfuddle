@@ -57,8 +57,8 @@ class Unfuddle
     
     
     def find_severity_by_name!(name)
-      severity = severities.find { |severity| severity.name == value }
-      severity || raise("A severity named \"#{value}\" is not defined!")
+      severity = severities.find { |severity| severity.name == name }
+      severity || raise("A severity named \"#{name}\" is not defined!")
     end
     
     def find_custom_field_value_by_value!(field, value)
@@ -100,7 +100,7 @@ class Unfuddle
       value = value.to_i if value.is_a?(String) && value =~ /^\d+$/
       
       # If the value is the name of a severity, try to look it up
-      value = find_severity_by_name!(value).id if key.to_s == :severity && value.is_a?(String)
+      value = find_severity_by_name!(value).id if key.to_s == "severity" && value.is_a?(String)
       
       # If the key is a custom field, look up the key and value
       if key.is_a?(String) && custom_field_defined?(key)
