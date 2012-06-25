@@ -45,7 +45,7 @@ class Unfuddle
   
   
   def project(project_id)
-    Unfuddle::Project.fetch(project_id)
+    Unfuddle::Project.new("id" => project_id)
   end
   
   

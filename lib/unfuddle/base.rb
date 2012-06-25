@@ -10,32 +10,40 @@ class Unfuddle
       @attributes = attributes
     end
     
+    def unfetched?
+      @attributes.keys == %w{id}
+    end
+    
+    def id
+      @attributes["id"]
+    end
+    
     
     
     # Respond to attributes
     
     def attributes
-      @attributes.dup
+      _attributes.dup
     end
     
     def method_missing(method_name, *args, &block)
-      if @attributes.key?(method_name.to_s)
-        @attributes[method_name.to_s]
+      if _attributes.key?(method_name.to_s)
+        _attributes[method_name.to_s]
       else
         super(method_name, *args, &block)
       end
     end
     
     def respond_to?(method_name)
-      if @attributes.key?(method_name.to_s)
+      if super(method_name)
         true
       else
-        super(method_name)
+        _attributes.key?(method_name.to_s)
       end
     end
     
     def write_attribute(attribute, value)
-      @attributes[attribute] = value
+      _attributes[attribute] = value
     end
     
     def update_attributes!(attributes)
@@ -151,6 +159,10 @@ class Unfuddle
       JSON.dump({singular_name => to_params})
     end
     
+    def fetch!
+      @attributes = get("")[1]
+    end
+    
     def save!
       put "", self
     end
@@ -160,6 +172,13 @@ class Unfuddle
     end
     
     
+    
+  private
+    
+    def _attributes
+      fetch! if unfetched?
+      @attributes
+    end
     
   end
 end
