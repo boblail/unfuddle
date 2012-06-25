@@ -1,5 +1,6 @@
 require 'net/https'
 require 'json'
+require 'benchmark'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
@@ -53,8 +54,7 @@ class Unfuddle
     path = "/api/v1/#{path}"
     request = Net::HTTP::Get.new(path, {"Accept" => "application/json"})
     request.basic_auth @username, @password
-    puts "[unfuddle:get]  #{path}"
-    http_send request
+    http_send_with_logging "[unfuddle:get]  #{path}", request
   end
   
   def post(path, object)
@@ -62,8 +62,7 @@ class Unfuddle
     xml = object.to_xml
     request = Net::HTTP::Post.new(path, {"Content-type" => "application/xml"})
     request.basic_auth @username, @password
-    puts "[unfuddle:post]  #{path}\n  #{xml}"
-    http_send request, xml
+    http_send_with_logging "[unfuddle:post]  #{path}\n  #{xml}", request, xml
   end
   
   def put(path, object)
@@ -71,16 +70,14 @@ class Unfuddle
     path = "/api/v1/#{path}"
     request = Net::HTTP::Put.new(path, {"Content-type" => "application/xml"})
     request.basic_auth @username, @password
-    puts "[unfuddle:put]  #{path}\n  #{xml}"
-    http_send request, xml
+    http_send_with_logging "[unfuddle:put]  #{path}\n  #{xml}", request, xml
   end
   
   def delete(path)
     path = "/api/v1/#{path}"
     request = Net::HTTP::Delete.new(path, {"Accept" => "application/json"})
     request.basic_auth @username, @password
-    puts "[unfuddle:delete]  #{path}"
-    http_send request
+    http_send_with_logging "[unfuddle:delete]  #{path}", request
   end
   
   
@@ -92,6 +89,13 @@ class Unfuddle
   
   
 protected
+  
+  def http_send_with_logging(message, request, *args)
+    response = nil
+    ms = Benchmark.ms { response =  http_send(request, *args) }
+    puts ('%s (%.1fms)' % [ message, ms ])
+    response
+  end
   
   def http_send(request, *args)
     response = http.request(request, *args)
