@@ -68,6 +68,13 @@ class Unfuddle
       result
     end
     
+    def find_custom_field_value_by_id!(field, id)
+      n = number_of_custom_field_named!(field)
+      result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.id == id }
+      raise "\"#{id}\" is not the id of a value for the custom field \"#{field}\"!" unless result
+      result
+    end
+    
     
     
     def find_tickets(*conditions)
@@ -113,6 +120,10 @@ class Unfuddle
     
     def get_key_for_custom_field_named!(name)
       "field_#{number_of_custom_field_named!(name)}"
+    end
+    
+    def get_ticket_attribute_for_custom_value_named!(name)
+      "field#{number_of_custom_field_named!(name)}_value_id"
     end
     
     
