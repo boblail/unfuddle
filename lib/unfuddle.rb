@@ -1,6 +1,6 @@
 require 'net/https'
 require 'json'
-require 'benchmark'
+require 'active_support/core_ext/benchmark'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
