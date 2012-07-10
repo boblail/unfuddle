@@ -13,6 +13,10 @@ class Unfuddle
       @value = value
     end
     
+    def to_s
+      "neq(#{value.inspect})"
+    end
+    
     attr_reader :value
     
   end
