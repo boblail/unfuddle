@@ -26,8 +26,12 @@ class Unfuddle
       _attributes.dup
     end
     
+    def invalid?
+      _attributes == :invalid
+    end
+    
     def method_missing(method_name, *args, &block)
-      if _attributes.key?(method_name.to_s)
+      if !invalid? && _attributes.key?(method_name.to_s)
         _attributes[method_name.to_s]
       else
         super(method_name, *args, &block)
