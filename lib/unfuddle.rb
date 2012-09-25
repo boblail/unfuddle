@@ -4,6 +4,7 @@ require 'active_support/core_ext/benchmark'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
+require 'unfuddle/error'
 require 'unfuddle/project'
 
 
@@ -100,7 +101,11 @@ protected
   def http_send(request, *args)
     response = http.request(request, *args)
     json = JSON.load(response.body) rescue :invalid
-    [response.code, json]
+    code = response.code.to_i
+    
+    raise ServerError.new(request) if code == 500
+    
+    [code, json]
   end
   
   def http

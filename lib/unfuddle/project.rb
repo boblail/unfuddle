@@ -51,41 +51,48 @@ class Unfuddle
     end
     
     def number_of_custom_field_named!(name)
-      number_of_custom_field_named(name) || raise("A custom field named \"#{name}\" is not defined!")
+      number_of_custom_field_named(name) || (raise ArgumentError, "A custom field named \"#{name}\" is not defined!")
     end
     
     
     
     def find_severity_by_name!(name)
       severity = severities.find { |severity| severity.name == name }
-      severity || raise("A severity named \"#{name}\" is not defined!")
+      severity || (raise ArgumentError, "A severity named \"#{name}\" is not defined!")
     end
     
     def find_custom_field_value_by_value!(field, value)
       n = number_of_custom_field_named!(field)
       result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.value == value }
-      raise "\"#{value}\" is not a value for the custom field \"#{field}\"!" unless result
+      raise ArgumentError, "\"#{value}\" is not a value for the custom field \"#{field}\"!" unless result
       result
     end
     
     def find_custom_field_value_by_id!(field, id)
       n = number_of_custom_field_named!(field)
       result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.id == id }
-      raise "\"#{id}\" is not the id of a value for the custom field \"#{field}\"!" unless result
+      raise ArgumentError, "\"#{id}\" is not the id of a value for the custom field \"#{field}\"!" unless result
       result
     end
     
     
     
-    def find_tickets(*conditions)
-      raise "No conditions supplied: that's probably not good" if conditions.none?
+    def find_tickets!(*conditions)
+      raise ArgumentError.new("No conditions supplied: that's probably not good") if conditions.none?
       path = "ticket_reports/dynamic.json"
       path << "?conditions_string=#{construct_ticket_query(*conditions)}"
       response = get(path)
-      raise "Invalid response" if response[1] == :invalid
+      
+      assert_response!(200, response)
+      
       ticket_report = response[1]
       group0 = ticket_report.fetch("groups", [])[0] || {}
       group0.fetch("tickets", [])
+    end
+    
+    def find_tickets(*args)
+      puts "Unfuddle::Project#find_tickets! is deprecated"
+      find_tickets!(*args)
     end
     
     def construct_ticket_query(*conditions)

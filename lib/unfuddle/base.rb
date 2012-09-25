@@ -60,8 +60,6 @@ class Unfuddle
     def update_attribute(attribute, value)
       write_attribute(attribute, value)
       save!
-      # xml = "<ticket><#{attribute}>#{value}</#{attribute}></ticket>"
-      # put("", xml)
     end
     
     
@@ -173,6 +171,16 @@ class Unfuddle
     
     def destroy!
       delete ""
+    end
+    
+    
+    
+  protected
+    
+    
+    
+    def assert_response!(expected_response_code, response)
+      raise InvalidResponseError.new(response) unless response[0] == expected_response_code
     end
     
     
