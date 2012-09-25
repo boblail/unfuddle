@@ -7,7 +7,7 @@ class Unfuddle
   class Base
     
     def initialize(attributes)
-      @attributes = attributes
+      __set_attributes(attributes)
     end
     
     def unfetched?
@@ -16,6 +16,13 @@ class Unfuddle
     
     def id
       @attributes["id"]
+    end
+    
+    def __set_attributes(attributes)
+      # raise ArgumentError, "attributes is expected to be a hash. It should not be nil" if attributes.nil?
+      raise ArgumentError, "attributes is expected to be a hash. It should not be :invalid" if attributes == :invalid
+      raise ArgumentError, "attributes is expected to be a hash, but it was #{attributes.class} instead" unless attributes.is_a?(Hash)
+      @attributes = attributes
     end
     
     
@@ -113,7 +120,7 @@ class Unfuddle
             instance = #{class_name}.new(params)
             attributes = post('#{path}', instance)[1]
             unless attributes == :invalid
-              instance.instance_variable_set(:@attributes, attributes)
+              instance.__set_attributes(attributes)
               @#{collection_name}.push(instance) if @#{collection_name}
               instance
             else
@@ -162,7 +169,9 @@ class Unfuddle
     end
     
     def fetch!
-      @attributes = get("")[1]
+      response = get("")
+      assert_response!(200, response)
+      __set_attributes(response[1])
     end
     
     def save!
