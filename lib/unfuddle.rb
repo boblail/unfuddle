@@ -6,9 +6,11 @@ require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
 require 'unfuddle/error'
 require 'unfuddle/project'
+require 'unfuddle/has_tickets'
 
 
 class Unfuddle
+  include HasTickets
   
   class << self
     
@@ -26,6 +28,10 @@ class Unfuddle
     
     def instance
       @unfuddle ||= self.new
+    end
+    
+    def assert_response!(expected_response_code, response)
+      raise InvalidResponseError.new(response) unless response[0] == expected_response_code
     end
     
     # Homemade `delegate`

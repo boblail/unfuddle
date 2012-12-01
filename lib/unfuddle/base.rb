@@ -170,7 +170,7 @@ class Unfuddle
     
     def fetch!
       response = get("")
-      assert_response!(200, response)
+      Unfuddle.assert_response!(200, response)
       __set_attributes(response[1])
     end
     
@@ -180,16 +180,6 @@ class Unfuddle
     
     def destroy!
       delete ""
-    end
-    
-    
-    
-  protected
-    
-    
-    
-    def assert_response!(expected_response_code, response)
-      raise InvalidResponseError.new(response) unless response[0] == expected_response_code
     end
     
     
