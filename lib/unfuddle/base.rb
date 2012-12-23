@@ -143,7 +143,7 @@ class Unfuddle
     [:get, :post, :put, :delete].each do |method|
       module_eval <<-RUBY
         def #{method}(path, *args)
-          Unfuddle.#{method}(relative_path + path, *args)
+          Unfuddle.#{method}(relative_path + "/" + path, *args)
         end
       RUBY
     end

@@ -15,7 +15,7 @@ class Unfuddle
     end
     
     def relative_path
-      "projects/#{id}/"
+      "projects/#{id}"
     end
     
     
