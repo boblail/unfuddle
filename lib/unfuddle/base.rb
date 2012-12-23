@@ -172,6 +172,10 @@ class Unfuddle
       response = get("")
       Unfuddle.assert_response!(200, response)
       __set_attributes(response[1])
+    
+    rescue InvalidResponseError
+      binding.pry if binding.respond_to?(:pry)
+      raise $!
     end
     
     def save!

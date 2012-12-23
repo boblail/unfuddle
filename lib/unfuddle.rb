@@ -31,7 +31,9 @@ class Unfuddle
     end
     
     def assert_response!(expected_response_code, response)
-      raise InvalidResponseError.new(response) unless response[0] == expected_response_code
+      unless response[0] == expected_response_code
+        raise InvalidResponseError.new(response)
+      end
     end
     
     # Homemade `delegate`
@@ -110,6 +112,7 @@ protected
     code = response.code.to_i
     
     raise ServerError.new(request) if code == 500
+    raise UnauthorizedError.new(request) if code == 401
     
     [code, json]
   end

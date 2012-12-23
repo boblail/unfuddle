@@ -47,33 +47,38 @@ class Unfuddle
       (1..3).find { |n| custom_fields[n].nil? }
     end
     
+    def number_of_custom_field_named!(name)
+      number_of_custom_field_named(name) || (raise UndefinedCustomField, "A custom field named \"#{name}\" is not defined!")
+    end
+    
     def number_of_custom_field_named(name)
       custom_fields.key(name)
     end
     
-    def number_of_custom_field_named!(name)
-      number_of_custom_field_named(name) || (raise ArgumentError, "A custom field named \"#{name}\" is not defined!")
-    end
     
-    
-    
-    def find_severity_by_name!(name)
-      severity = severities.find { |severity| severity.name == name }
-      severity || (raise ArgumentError, "A severity named \"#{name}\" is not defined!")
-    end
     
     def find_custom_field_value_by_value!(field, value)
       n = number_of_custom_field_named!(field)
       result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.value == value }
-      raise ArgumentError, "\"#{value}\" is not a value for the custom field \"#{field}\"!" unless result
+      raise UndefinedCustomFieldValue, "\"#{value}\" is not a value for the custom field \"#{field}\"!" unless result
       result
     end
     
     def find_custom_field_value_by_id!(field, id)
       n = number_of_custom_field_named!(field)
       result = custom_field_values.find { |cfv| cfv.field_number == n && cfv.id == id }
-      raise ArgumentError, "\"#{id}\" is not the id of a value for the custom field \"#{field}\"!" unless result
+      raise UndefinedCustomFieldValue, "\"#{id}\" is not the id of a value for the custom field \"#{field}\"!" unless result
       result
+    end
+    
+    
+    
+    def find_severity_by_name!(name)
+      find_severity_by_name(name) || (raise UndefinedSeverity, "A severity named \"#{name}\" is not defined!")
+    end
+    
+    def find_severity_by_name(name)
+      severities.find { |severity| severity.name == name }
     end
     
     
@@ -87,12 +92,12 @@ class Unfuddle
       key, value = super
       
       # If the value is the name of a severity, try to look it up
-      value = find_severity_by_name!(value).id if key.to_s == "severity" && value.is_a?(String)
+      value = find_severity_by_name!(value).id if key == :severity && value.is_a?(String)
       
       # If the key is a custom field, look up the key and value
-      if key.is_a?(String) && custom_field_defined?(key)
-        value = find_custom_field_value_by_value!(key, value).id unless value.is_a?(Fixnum)
+      if key.is_a?(String)
         key = get_key_for_custom_field_named!(key)
+        value = find_custom_field_value_by_value!(key, value).id unless value.is_a?(Fixnum)
       end
       
       [key, value]
