@@ -38,7 +38,7 @@ class Unfuddle
     end
     
     def method_missing(method_name, *args, &block)
-      if !invalid? && _attributes.key?(method_name.to_s)
+      if !invalid? && has_attribute?(method_name)
         _attributes[method_name.to_s]
       else
         super(method_name, *args, &block)
@@ -46,15 +46,15 @@ class Unfuddle
     end
     
     def respond_to?(method_name)
-      if super(method_name)
-        true
-      else
-        _attributes.key?(method_name.to_s)
-      end
+      super(method_name) || has_attribute?(method_name)
+    end
+    
+    def has_attribute?(attribute_name)
+      _attributes.key?(attribute_name.to_s)
     end
     
     def write_attribute(attribute, value)
-      _attributes[attribute] = value
+      _attributes[attribute.to_s] = value
     end
     
     def update_attributes!(attributes)
