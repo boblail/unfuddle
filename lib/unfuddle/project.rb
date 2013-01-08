@@ -96,8 +96,8 @@ class Unfuddle
       
       # If the key is a custom field, look up the key and value
       if key.is_a?(String)
-        key = get_key_for_custom_field_named!(key)
         value = find_custom_field_value_by_value!(key, value).id unless value.is_a?(Fixnum)
+        key = get_key_for_custom_field_named!(key)
       end
       
       [key, value]
