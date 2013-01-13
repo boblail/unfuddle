@@ -83,11 +83,6 @@ class Unfuddle
     
     
     
-    def find_tickets(*args)
-      puts "Unfuddle::Project#find_tickets! is deprecated"
-      find_tickets!(*args)
-    end
-    
     def prepare_key_and_value_for_conditions_string(key, value)
       key, value = super
       
