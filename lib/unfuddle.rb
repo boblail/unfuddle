@@ -1,4 +1,4 @@
-require 'net/https'
+require 'faraday'
 require 'json'
 require 'active_support/core_ext/benchmark'
 require 'active_support/core_ext/hash'
@@ -60,33 +60,19 @@ class Unfuddle
   
   
   def get(path)
-    path = "/api/v1/#{path}"
-    request = Net::HTTP::Get.new(path, {"Accept" => "application/json"})
-    request.basic_auth @username, @password
-    http_send_with_logging "[unfuddle:get]  #{path}", request
+    http_send_with_logging :get, path
   end
   
   def post(path, object)
-    path = "/api/v1/#{path}"
-    xml = object.to_xml
-    request = Net::HTTP::Post.new(path, {"Content-type" => "application/xml"})
-    request.basic_auth @username, @password
-    http_send_with_logging "[unfuddle:post]  #{path}\n  #{xml}", request, xml
+    http_send_with_logging :post, path, object.to_xml
   end
   
   def put(path, object)
-    xml = object.to_xml
-    path = "/api/v1/#{path}"
-    request = Net::HTTP::Put.new(path, {"Content-type" => "application/xml"})
-    request.basic_auth @username, @password
-    http_send_with_logging "[unfuddle:put]  #{path}\n  #{xml}", request, xml
+    http_send_with_logging :put, path, object.to_xml
   end
   
   def delete(path)
-    path = "/api/v1/#{path}"
-    request = Net::HTTP::Delete.new(path, {"Accept" => "application/json"})
-    request.basic_auth @username, @password
-    http_send_with_logging "[unfuddle:delete]  #{path}", request
+    http_send_with_logging :delete, path
   end
   
   
@@ -99,34 +85,44 @@ class Unfuddle
   
 protected
   
-  def http_send_with_logging(message, request, *args)
+  def http_send_with_logging(method, path, body=nil, headers={})
+    path = "/api/v1/#{path}"
+    headers = headers.merge({ # read JSON, write XML
+      "Accept" => "application/json",
+      "Content-type" => "application/xml" })
+    
     response = nil
-    ms = Benchmark.ms { response =  http_send(request, *args) }
+    ms = Benchmark.ms do
+      response =  http_send(method, path, body, headers)
+    end
+    
+    message = "[unfuddle:#{method}]  #{path}"
+    message << "\n  #{body}" if body
     puts ('%s (%.1fms)' % [ message, ms ])
+    
     response
   end
   
-  def http_send(request, *args)
-    response = http.request(request, *args)
-    json = JSON.load(response.body) rescue :invalid
-    code = response.code.to_i
+  def http_send(method, path, body, headers)
+    response = http.public_send(method, path, body, headers)
     
+    code = response.status
     raise ServerError.new(request) if code == 500
     raise UnauthorizedError.new(request) if code == 401
     
+    json = JSON.load(response.body) rescue :invalid
+    
     [code, json]
-  
-  # rescue Errno::ECONNECTRESET -> can retry? -> should use Faraday??
-  
-  rescue SocketError
+    
+  rescue Faraday::Error::ConnectionFailed
     raise ConnectionError
   end
   
   def http
     raise "Unfuddle is not configured" unless configured?
-    @http ||= Net::HTTP.new("#{@subdomain}.unfuddle.com", 443).tap do |http|
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    @http ||= Faraday.new("https://#{@subdomain}.unfuddle.com", ssl: {verify: false}) do |faraday|
+      faraday.adapter Faraday.default_adapter
+      faraday.basic_auth @username, @password
     end
   end
   

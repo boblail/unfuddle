@@ -28,6 +28,8 @@ class Unfuddle
   end
   
   class InvalidResponseError < StandardError
+    include ::Unfuddle::Error
+    
     def initialize(response)
       @response = response
     end

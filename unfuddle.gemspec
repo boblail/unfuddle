@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   
   s.add_dependency "active_support"
   s.add_dependency "builder"
+  s.add_dependency "faraday"
   
   s.add_development_dependency "rails"
   s.add_development_dependency "turn"
