@@ -1,6 +1,15 @@
 class Unfuddle
   
+  module Error
+  end
+  
+  class ConnectionError < StandardError
+    include ::Unfuddle::Error
+  end
+  
   class ServerError < StandardError
+    include ::Unfuddle::Error
+    
     def initialize(request)
       @request = request
     end
@@ -9,6 +18,8 @@ class Unfuddle
   end
   
   class UnauthorizedError < StandardError
+    include ::Unfuddle::Error
+    
     def initialize(request)
       @request = request
     end
@@ -26,12 +37,15 @@ class Unfuddle
   
   
   class UndefinedCustomField < ArgumentError
+    include ::Unfuddle::Error
   end
   
   class UndefinedCustomFieldValue < ArgumentError
+    include ::Unfuddle::Error
   end
   
   class UndefinedSeverity < ArgumentError
+    include ::Unfuddle::Error
   end
   
 end

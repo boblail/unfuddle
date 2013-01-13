@@ -115,6 +115,11 @@ protected
     raise UnauthorizedError.new(request) if code == 401
     
     [code, json]
+  
+  # rescue Errno::ECONNECTRESET -> can retry? -> should use Faraday??
+  
+  rescue SocketError
+    raise ConnectionError
   end
   
   def http
