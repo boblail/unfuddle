@@ -12,7 +12,7 @@ class Unfuddle
       
       Unfuddle.assert_response!(200, response)
       
-      ticket_report = response[1]
+      ticket_report = response.json
       group0 = ticket_report.fetch("groups", [])[0] || {}
       group0.fetch("tickets", [])
     end

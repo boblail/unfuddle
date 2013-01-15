@@ -6,6 +6,7 @@ require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
 require 'unfuddle/error'
 require 'unfuddle/project'
+require 'unfuddle/response'
 require 'unfuddle/has_tickets'
 
 
@@ -31,7 +32,7 @@ class Unfuddle
     end
     
     def assert_response!(expected_response_code, response)
-      unless response[0] == expected_response_code
+      unless response.status == expected_response_code
         raise InvalidResponseError.new(response)
       end
     end
@@ -110,9 +111,7 @@ protected
     raise ServerError.new(request) if code == 500
     raise UnauthorizedError.new(request) if code == 401
     
-    json = JSON.load(response.body) rescue :invalid
-    
-    [code, json]
+    Response.new(response)
     
   rescue Faraday::Error::ConnectionFailed
     raise ConnectionError

@@ -19,8 +19,6 @@ class Unfuddle
     end
     
     def __set_attributes(attributes)
-      # raise ArgumentError, "attributes is expected to be a hash. It should not be nil" if attributes.nil?
-      raise ArgumentError, "attributes is expected to be a hash. It should not be :invalid" if attributes == :invalid
       raise ArgumentError, "attributes is expected to be a hash, but it was #{attributes.class} instead" unless attributes.is_a?(Hash)
       @attributes = attributes
     end
@@ -33,12 +31,8 @@ class Unfuddle
       _attributes.dup
     end
     
-    def invalid?
-      _attributes == :invalid
-    end
-    
     def method_missing(method_name, *args, &block)
-      if !invalid? && has_attribute?(method_name)
+      if has_attribute?(method_name)
         _attributes[method_name.to_s]
       else
         super(method_name, *args, &block)
@@ -103,13 +97,16 @@ class Unfuddle
         
         class_eval <<-RUBY
           def #{collection_name}
-            @#{collection_name} ||= get('#{path}')[1].map { |attributes| #{class_name}.new(attributes) }
+            @#{collection_name} ||= get('#{path}').json.map { |attributes| #{class_name}.new(attributes) }
           end
           
           def #{individual_name}(id)
             response = get("#{path}/\#{id}")
-            return nil if response[1] == :invalid
-            #{class_name}.new response[1]
+            
+            return nil if response.status == 404
+            Unfuddle.assert_response!(200, response)
+            
+            #{class_name}.new response.json
           end
           
           def new_#{individual_name}(attributes)
@@ -118,14 +115,13 @@ class Unfuddle
           
           def create_#{individual_name}(params)
             instance = #{class_name}.new(params)
-            attributes = post('#{path}', instance)[1]
-            unless attributes == :invalid
-              instance.__set_attributes(attributes)
-              @#{collection_name}.push(instance) if @#{collection_name}
-              instance
-            else
-              nil
-            end
+            response = post('#{path}', instance)
+            
+            Unfuddle.assert_response!(201, response)
+            
+            instance.__set_attributes(response.json)
+            @#{collection_name}.push(instance) if @#{collection_name}
+            instance
           end
         RUBY
       end
@@ -171,7 +167,7 @@ class Unfuddle
     def fetch!
       response = get("")
       Unfuddle.assert_response!(200, response)
-      __set_attributes(response[1])
+      __set_attributes(response.json)
     
     rescue InvalidResponseError
       binding.pry if binding.respond_to?(:pry)
