@@ -10,8 +10,16 @@ class Unfuddle
       faraday_response.status
     end
     
+    def body
+      faraday_response.body
+    end
+    
     def json
-      @json ||= JSON.load(faraday_response.body)
+      @json ||= JSON.load(self.class.normalized_body(body))
+    end
+    
+    def self.normalized_body(body)
+      body.gsub(/\u0000/, "")
     end
     
     
