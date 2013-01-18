@@ -1,3 +1,6 @@
+require 'unfuddle/error'
+
+
 class Unfuddle
   class Response
     
@@ -8,6 +11,14 @@ class Unfuddle
     
     def status
       faraday_response.status
+    end
+    
+    def server_error?
+      status == 500
+    end
+    
+    def unauthorized?
+      status == 401
     end
     
     def body

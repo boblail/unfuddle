@@ -107,11 +107,10 @@ protected
   def http_send(method, path, body, headers)
     response = http.public_send(method, path, body, headers)
     
-    code = response.status
-    raise ServerError.new(request) if code == 500
-    raise UnauthorizedError.new(request) if code == 401
-    
-    Response.new(response)
+    Response.new(response).tap do |response|
+      raise ServerError.new(response) if response.server_error?
+      raise UnauthorizedError.new(response) if response.unauthorized?
+    end
     
   rescue Faraday::Error::ConnectionFailed
     raise ConnectionError

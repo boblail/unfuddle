@@ -7,25 +7,7 @@ class Unfuddle
     include ::Unfuddle::Error
   end
   
-  class ServerError < StandardError
-    include ::Unfuddle::Error
-    
-    def initialize(request)
-      @request = request
-    end
-    
-    attr_reader :request
-  end
   
-  class UnauthorizedError < StandardError
-    include ::Unfuddle::Error
-    
-    def initialize(request)
-      @request = request
-    end
-    
-    attr_reader :request
-  end
   
   class InvalidResponseError < StandardError
     include ::Unfuddle::Error
@@ -36,6 +18,13 @@ class Unfuddle
     
     attr_reader :response
   end
+  
+  class ServerError < InvalidResponseError
+  end
+  
+  class UnauthorizedError < InvalidResponseError
+  end
+  
   
   
   class UndefinedCustomField < ArgumentError
