@@ -101,12 +101,16 @@ class Unfuddle
           end
           
           def #{individual_name}(id)
+            #{class_name}.new find_#{individual_name}(id)
+          end
+          
+          def find_#{individual_name}(id)
             response = get("#{path}/\#{id}")
             
             return nil if response.status == 404
             Unfuddle.assert_response!(200, response)
             
-            #{class_name}.new response.json
+            response.json
           end
           
           def new_#{individual_name}(attributes)
