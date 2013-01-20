@@ -23,6 +23,11 @@ class Unfuddle
   end
   
   class UnauthorizedError < InvalidResponseError
+    
+    def message
+      "The user '#{Unfuddle.instance.username}' does not have permission to access this resource"
+    end
+    
   end
   
   
