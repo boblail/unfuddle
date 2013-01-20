@@ -15,16 +15,21 @@ class Unfuddle
   
   class << self
     
-    def config(*args)
-      configuration = Unfuddle::Configuration.new(instance)
-      if args.first.is_a?(Hash)
-        options = args.first.with_indifferent_access
-        configuration.subdomain = options[:subdomain] if options.key?(:subdomain)
-        configuration.username  = options[:username]  if options.key?(:username)
-        configuration.password  = options[:password]  if options.key?(:password)
-      end
+    def config(options=nil)
+      configuration = Unfuddle::Configuration.new
+      configuration.from_options(options) if options
       yield configuration if block_given?
-      configuration
+      instance.configuration = configuration
+    end
+    
+    def with_config(options)
+      current_configuration = instance.configuration
+      begin
+        config(options)
+        yield
+      ensure
+        instance.configuration = current_configuration
+      end
     end
     
     def instance
@@ -38,7 +43,7 @@ class Unfuddle
     end
     
     # Homemade `delegate`
-    [:get, :post, :put, :delete].each do |method|
+    [:get, :post, :put, :delete, :configuration].each do |method|
       module_eval <<-RUBY
         def #{method}(*args, &block)
           instance.#{method}(*args, &block)
@@ -46,11 +51,30 @@ class Unfuddle
       RUBY
     end
     
+    [:subdomain, :username, :password, :include_associations?].each do |method|
+      module_eval <<-RUBY
+        def #{method}
+          configuration.#{method}
+        end
+      RUBY
+    end
+    
   end
   
-  attr_reader :subdomain,
-              :username,
-              :password
+  attr_reader :configuration
+  
+  def configuration=(configuration)
+    @configuration = configuration
+    @http = nil
+  end
+  
+  [:subdomain, :username, :password, :include_associations?].each do |method|
+    module_eval <<-RUBY
+      def #{method}
+        configuration.#{method}
+      end
+    RUBY
+  end
   
   
   
@@ -118,9 +142,9 @@ protected
   
   def http
     raise "Unfuddle is not configured" unless configured?
-    @http ||= Faraday.new("https://#{@subdomain}.unfuddle.com", ssl: {verify: false}) do |faraday|
+    @http ||= Faraday.new("https://#{subdomain}.unfuddle.com", ssl: {verify: false}) do |faraday|
       faraday.adapter Faraday.default_adapter
-      faraday.basic_auth @username, @password
+      faraday.basic_auth username, password
     end
   end
   

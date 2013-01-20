@@ -1,12 +1,8 @@
 class Unfuddle
   class Configuration
     
-    def initialize(instance)
-      @instance = instance
-    end
     
-    
-    [:subdomain, :username, :password].each do |attribute|
+    [:subdomain, :username, :password, :include_associations].each do |attribute|
       module_eval <<-RUBY
         def #{attribute}(*arg)
           set_value :#{attribute}, arg.first if arg.any?
@@ -20,15 +16,26 @@ class Unfuddle
     end
     
     
+    alias :include_associations? :include_associations
+    
+    
+    def from_options(options)
+      options = options.with_indifferent_access
+      self.subdomain             = options[:subdomain]             if options.key?(:subdomain)
+      self.username              = options[:username]              if options.key?(:username)
+      self.password              = options[:password]              if options.key?(:password)
+      self.include_associations  = options[:include_associations]  if options.key?(:include_associations)
+    end
+    
+    
   private
     
     def set_value(attribute, value)
-      @instance.instance_variable_set(:"@#{attribute}", value)
-      @instance.instance_variable_set(:@http, nil)
+      instance_variable_set(:"@#{attribute}", value)
     end
     
     def get_value(attribute)
-      @instance.send(attribute)
+      instance_variable_get(:"@#{attribute}")
     end
     
   end
