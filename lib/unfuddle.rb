@@ -138,6 +138,8 @@ protected
     
   rescue Faraday::Error::ConnectionFailed
     raise ConnectionError
+  rescue Faraday::Error::TimeoutError, Errno::ETIMEDOUT
+    raise TimeoutError
   end
   
   def http

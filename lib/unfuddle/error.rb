@@ -7,6 +7,9 @@ class Unfuddle
     include ::Unfuddle::Error
   end
   
+  class TimeoutError < ConnectionError
+  end
+  
   
   
   class InvalidResponseError < StandardError
