@@ -21,9 +21,19 @@ class Unfuddle
     
     
     def construct_ticket_query(*conditions)
-      options = conditions.extract_options!
-      conditions.concat(options.map { |key, value| Array.wrap(value).map { |value| create_condition_string(key, value) }.join("|") })
-      conditions.join("%2C")
+      conditions_string = []
+      conditions.each do |condition|
+        case condition
+        when Hash
+          conditions_string.concat(condition.map { |key, value| Array.wrap(value).map { |value| create_condition_string(key, value) }.join("|") })
+        when Array
+          key, value = condition
+          conditions_string.push(Array.wrap(value).map { |value| create_condition_string(key, value) }.join("|"))
+        else
+          conditions_string.push(condition)
+        end
+      end
+      conditions_string.join("%2C")
     end
     
     def create_condition_string(key, value)
