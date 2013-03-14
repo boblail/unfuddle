@@ -51,7 +51,7 @@ class Unfuddle
       RUBY
     end
     
-    [:subdomain, :username, :password, :include_associations?].each do |method|
+    [:subdomain, :username, :password, :logger, :include_associations?].each do |method|
       module_eval <<-RUBY
         def #{method}
           configuration.#{method}
@@ -68,7 +68,7 @@ class Unfuddle
     @http = nil
   end
   
-  [:subdomain, :username, :password, :include_associations?].each do |method|
+  [:subdomain, :username, :password, :logger, :include_associations?].each do |method|
     module_eval <<-RUBY
       def #{method}
         configuration.#{method}
@@ -120,12 +120,15 @@ protected
     ms = Benchmark.ms do
       response =  http_send(method, path, body, headers)
     end
-    
+    response
+  ensure
     message = "[unfuddle:#{method}]  #{path}"
     message << "\n  #{body}" if body
-    puts ('%s (%.1fms)' % [ message, ms ])
+    message = '%s (%.1fms)' % [ message, ms ] if ms
+    logger.info(message)
     
-    response
+    url = http.url_prefix.to_s + path
+    logger.warn "[unfuddle:#{method}] URL length exceeded 2000 characters" if url.length > 2000
   end
   
   def http_send(method, path, body, headers)

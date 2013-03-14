@@ -2,7 +2,7 @@ class Unfuddle
   class Configuration
     
     
-    [:subdomain, :username, :password, :include_associations].each do |attribute|
+    [:subdomain, :username, :password, :logger, :include_associations].each do |attribute|
       module_eval <<-RUBY
         def #{attribute}(*arg)
           set_value :#{attribute}, arg.first if arg.any?
@@ -25,6 +25,14 @@ class Unfuddle
       self.username              = options[:username]              if options.key?(:username)
       self.password              = options[:password]              if options.key?(:password)
       self.include_associations  = options[:include_associations]  if options.key?(:include_associations)
+      self.logger                = options.fetch :logger, Unfuddle::Configuration::Logger.new
+    end
+    
+    
+    class Logger
+      def info(s)
+        puts s
+      end
     end
     
     
