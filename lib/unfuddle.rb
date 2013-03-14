@@ -137,9 +137,9 @@ protected
     end
     
   rescue Faraday::Error::ConnectionFailed
-    raise ConnectionError
+    raise ConnectionError, $!.message
   rescue Faraday::Error::TimeoutError, Errno::ETIMEDOUT
-    raise TimeoutError
+    raise TimeoutError, $!.message
   end
   
   def http
