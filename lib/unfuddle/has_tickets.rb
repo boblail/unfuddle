@@ -8,7 +8,10 @@ class Unfuddle
       raise ArgumentError.new("No conditions supplied: that's probably not good") if conditions.none?
       path = "ticket_reports/dynamic.json"
       path << "?conditions_string=#{construct_ticket_query(*conditions)}"
-      path << "&fields_string=associations" if Unfuddle.include_associations?
+      fields = []
+      fields << "associations" if Unfuddle.include_associations?
+      fields << "closed_on" if Unfuddle.include_closed_on?
+      path << "&fields_string=#{fields.join(",")}" if fields.any?
       response = get(path)
       
       Unfuddle.assert_response!(200, response)

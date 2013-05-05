@@ -51,7 +51,7 @@ class Unfuddle
       RUBY
     end
     
-    [:subdomain, :username, :password, :logger, :include_associations?].each do |method|
+    [:subdomain, :username, :password, :logger, :include_associations?, :include_closed_on?].each do |method|
       module_eval <<-RUBY
         def #{method}
           configuration.#{method}
@@ -68,7 +68,7 @@ class Unfuddle
     @http = nil
   end
   
-  [:subdomain, :username, :password, :logger, :include_associations?].each do |method|
+  [:subdomain, :username, :password, :logger, :include_associations?, :include_closed_on?].each do |method|
     module_eval <<-RUBY
       def #{method}
         configuration.#{method}
