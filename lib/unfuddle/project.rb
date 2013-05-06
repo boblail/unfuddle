@@ -7,11 +7,27 @@ class Unfuddle
     include HasTickets
     
     def self.all
-      @projects ||= Unfuddle.get('projects')[1].map { |attributes| self.new(attributes) }
+      @projects ||= begin
+        response = Unfuddle.get('projects')
+        
+        if response.status == 404
+          nil
+        else
+          Unfuddle.assert_response!(200, response)
+          response.json.map { |attributes| self.new(attributes) }
+        end
+      end
     end
     
     def self.fetch(id)
-      self.new Unfuddle.get("projects/#{id}")[1]
+      response = Unfuddle.get("projects/#{id}")
+      
+      if response.status == 404
+        nil
+      else
+        Unfuddle.assert_response!(200, response)
+        self.new response.json
+      end
     end
     
     def relative_path
