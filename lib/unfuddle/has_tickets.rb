@@ -4,6 +4,15 @@ require 'active_support/core_ext/array/wrap'
 class Unfuddle
   module HasTickets
     
+    def find_ticket_by_number(number)
+      response = get("tickets/by_number/#{number}")
+      
+      return nil if response.status == 404
+      Unfuddle.assert_response!(200, response)
+      
+      response.json
+    end
+    
     def find_tickets!(*conditions)
       raise ArgumentError.new("No conditions supplied: that's probably not good") if conditions.none?
       path = "ticket_reports/dynamic.json"
