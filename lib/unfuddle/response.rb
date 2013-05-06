@@ -26,11 +26,14 @@ class Unfuddle
     end
     
     def json
-      @json ||= JSON.load(self.class.normalized_body(body))
+      @json ||= begin
+        json = self.class.normalized_body(body)
+        json.empty? ? {} : JSON.load(json)
+      end
     end
     
     def self.normalized_body(body)
-      body.gsub(/\u0000/, "")
+      body.gsub(/\u0000/, "").strip
     end
     
     

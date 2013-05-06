@@ -123,7 +123,7 @@ class Unfuddle
             
             Unfuddle.assert_response!(201, response)
             
-            instance.__set_attributes(response.json)
+            instance.__set_attributes(params.merge(response.json))
             @#{collection_name}.push(instance) if @#{collection_name}
             instance
           end
