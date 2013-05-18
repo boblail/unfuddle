@@ -40,6 +40,7 @@ class Unfuddle
     
     has_many :custom_field_values
     has_many :severities
+    has_many :components
     has_many :ticket_reports
     has_many :tickets
     
