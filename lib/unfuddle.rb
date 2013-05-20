@@ -25,7 +25,7 @@ class Unfuddle
     def with_config(options)
       current_configuration = instance.configuration
       begin
-        config(options)
+        config(current_configuration.merge(options))
         yield
       ensure
         instance.configuration = current_configuration

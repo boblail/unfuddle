@@ -20,6 +20,19 @@ class Unfuddle
     alias :include_closed_on? :include_closed_on
     
     
+    def merge(options)
+      to_h.merge(options)
+    end
+    
+    def to_h
+      { subdomain: subdomain,
+        username: username,
+        password: password,
+        include_associations: include_associations,
+        include_closed_on: include_closed_on,
+        logged: logger }
+    end
+    
     def from_options(options)
       options = options.with_indifferent_access
       self.subdomain             = options[:subdomain]             if options.key?(:subdomain)
