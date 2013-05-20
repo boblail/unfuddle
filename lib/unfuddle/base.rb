@@ -105,7 +105,8 @@ class Unfuddle
           end
           
           def #{individual_name}(id)
-            #{class_name}.new find_#{individual_name}(id)
+            attributes = find_#{individual_name}(id)
+            #{class_name}.new(attributes) if attributes
           end
           
           def find_#{individual_name}(id)
