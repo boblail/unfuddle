@@ -20,7 +20,11 @@ class Unfuddle
     
     def __set_attributes(attributes)
       raise ArgumentError, "attributes is expected to be a hash, but it was #{attributes.class} instead" unless attributes.is_a?(Hash)
-      @attributes = attributes
+      if @attributes
+        @attributes.merge! attributes
+      else
+        @attributes = attributes
+      end
     end
     
     
