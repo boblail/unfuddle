@@ -3,6 +3,10 @@ class Unfuddle
   module Error
   end
   
+  class ConfigurationError < StandardError
+    include ::Unfuddle::Error
+  end
+  
   class ConnectionError < StandardError
     include ::Unfuddle::Error
   end

@@ -146,7 +146,7 @@ protected
   end
   
   def http
-    raise "Unfuddle is not configured" unless configured?
+    raise ConfigurationError, "Unfuddle is not configured" unless configured?
     @http ||= Faraday.new("https://#{subdomain}.unfuddle.com", ssl: {verify: false}) do |faraday|
       faraday.adapter Faraday.default_adapter
       faraday.basic_auth username, password
