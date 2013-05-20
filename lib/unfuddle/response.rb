@@ -25,6 +25,10 @@ class Unfuddle
       faraday_response.body
     end
     
+    def location
+      faraday_response["location"]
+    end
+    
     def json
       @json ||= begin
         json = self.class.normalized_body(body)

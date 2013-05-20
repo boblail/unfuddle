@@ -125,10 +125,15 @@ class Unfuddle
           def create_#{individual_name}(params)
             instance = #{class_name}.new(params)
             response = post('#{path}', instance)
-            
             Unfuddle.assert_response!(201, response)
             
-            instance.__set_attributes(params.merge(response.json))
+            instance.__set_attributes(response.json)
+            
+            unless instance.id
+              id = response.location.chomp("/")[/\\d+$/].to_i
+              instance.__set_attributes("id" => id) if id > 0
+            end
+            
             @#{collection_name}.push(instance) if @#{collection_name}
             instance
           end
