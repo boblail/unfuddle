@@ -43,6 +43,7 @@ class Unfuddle
     has_many :components
     has_many :ticket_reports
     has_many :tickets
+    has_many :milestones
     
     
     
