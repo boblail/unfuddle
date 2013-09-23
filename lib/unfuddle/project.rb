@@ -47,6 +47,12 @@ class Unfuddle
     
     
     
+    def open_milestones
+      @open_milestones ||= get("projects/#{id}/milestones/upcoming").json.map { |attributes| Milestone.new(attributes) }
+    end
+    
+    
+    
     def custom_fields
       { 1 => ticket_field1_active ? ticket_field1_title : nil,
         2 => ticket_field2_active ? ticket_field2_title : nil,
