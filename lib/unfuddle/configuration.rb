@@ -2,7 +2,7 @@ class Unfuddle
   class Configuration
     
     
-    [:subdomain, :username, :password, :logger, :include_associations, :include_closed_on].each do |attribute|
+    [:subdomain, :username, :password, :logger, :include_associations, :include_closed_on, :timeout].each do |attribute|
       module_eval <<-RUBY
         def #{attribute}(*arg)
           set_value :#{attribute}, arg.first if arg.any?
@@ -30,7 +30,8 @@ class Unfuddle
         password: password,
         include_associations: include_associations,
         include_closed_on: include_closed_on,
-        logged: logger }
+        logged: logger,
+        timeout: timeout }
     end
     
     def from_options(options)
@@ -40,6 +41,7 @@ class Unfuddle
       self.password              = options[:password]              if options.key?(:password)
       self.include_associations  = options[:include_associations]  if options.key?(:include_associations)
       self.include_closed_on     = options[:include_closed_on]     if options.key?(:include_closed_on)
+      self.timeout               = options.fetch :timeout, 120
       self.logger                = options.fetch :logger, Unfuddle::Configuration::Logger.new
     end
     
