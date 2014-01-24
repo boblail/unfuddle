@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   
   s.rubyforge_project = "unfuddle"
   
-  s.add_dependency "active_support"
+  s.add_dependency "activesupport"
   s.add_dependency "builder"
   s.add_dependency "faraday"
   
