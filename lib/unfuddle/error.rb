@@ -24,6 +24,11 @@ class Unfuddle
     end
     
     attr_reader :response
+    
+    def message
+      response.body
+    end
+    
   end
   
   class ServerError < InvalidResponseError
