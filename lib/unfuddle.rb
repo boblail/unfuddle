@@ -6,6 +6,7 @@ require 'active_support/core_ext/hash/indifferent_access'
 require 'unfuddle/configuration'
 require 'unfuddle/error'
 require 'unfuddle/project'
+require 'unfuddle/person'
 require 'unfuddle/response'
 require 'unfuddle/has_tickets'
 
@@ -80,6 +81,10 @@ class Unfuddle
   
   def project(project_id)
     Unfuddle::Project.new("id" => project_id)
+  end
+  
+  def person(person_id)
+    Unfuddle::Person.new("id" => person_id)
   end
   
   
