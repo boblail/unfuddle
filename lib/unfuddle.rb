@@ -79,8 +79,16 @@ class Unfuddle
   
   
   
+  def projects
+    Unfuddle.Project.all
+  end
+  
   def project(project_id)
     Unfuddle::Project.new("id" => project_id)
+  end
+  
+  def people(options={})
+    Unfuddle::Person.all(options)
   end
   
   def person(person_id)
