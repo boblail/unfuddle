@@ -179,7 +179,7 @@ class Unfuddle
     end
     
     def fetch!
-      response = get("")
+      response = get(get_path)
       Unfuddle.assert_response!(200, response)
       __set_attributes(response.json)
     
@@ -189,11 +189,25 @@ class Unfuddle
     end
     
     def save!
-      put "", self
+      put put_path, self
     end
     
     def destroy!
-      delete ""
+      delete delete_path
+    end
+    
+    
+    
+    def get_path
+      ""
+    end
+    
+    def put_path
+      ""
+    end
+    
+    def delete_path
+      ""
     end
     
     
