@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "activesupport"
   s.add_dependency "builder"
-  s.add_dependency "faraday", "~> 0.8.8"
+  s.add_dependency "faraday", ">= 0.8", "< 0.10"
 
   s.add_development_dependency "rails"
   s.add_development_dependency "turn"
