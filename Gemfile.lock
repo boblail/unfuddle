@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    boblail-unfuddle (0.7.0)
+    boblail-unfuddle (0.7.1)
       activesupport
       builder
       faraday (>= 0.8, < 0.10)
